@@ -903,7 +903,7 @@ function App() {
       const params = new URLSearchParams({token:tok,...filter});
       const r = await fetch(`${API}/api/worklist?${params}`);
       const d = await r.json();
-      setStudies(d.studies || []);
+      setStudies(d.studies || []); if(d.studies&&d.studies[0]) console.log("critical_flag type:", typeof d.studies[0].critical_flag, "value:", d.studies[0].critical_flag);
     } catch(e){ console.error(e); }
   },[tok,filter]);
 
@@ -1174,7 +1174,7 @@ function App() {
             <div className="banner-field"><div className="bf-label">DOB / Age</div><div className="bf-val">{fmtDate(selectedStudy.dob)} ({age(selectedStudy.dob)}y)</div></div>
             <div className="banner-field"><div className="bf-label">Sex</div><div className="bf-val">{selectedStudy.sex}</div></div>
             <div className="banner-field"><div className="bf-label">Modality</div><div className="bf-val">{selectedStudy.modality} · {selectedStudy.body_part}</div></div>
-            {selectedStudy.critical_flag==1 && <div className="banner-field"><div className="pb-critical">⚠ CRITICAL</div></div>}
+            {Number(selectedStudy.critical_flag)===1 && <div className="banner-field"><div className="pb-critical">⚠ CRITICAL</div></div>}
             {(() => { try { const a=JSON.parse(selectedStudy.allergies||'[]'); return a.length&&a[0]!=='None known'?<div className="banner-field"><div className="bf-label">Allergies</div><div className="bf-val alert">{a.slice(0,2).join(', ')}</div></div>:null; } catch{ return null; } })()}
           </> : <div style={{color:'rgba(255,255,255,0.3)',fontSize:'12px',padding:'0 16px'}}>No study selected — select from worklist</div>}
         </div>
@@ -1268,7 +1268,7 @@ function App() {
                         <td style={{fontSize:'10px'}}>{s.ordering_clinician}</td>
                         <td style={{fontFamily:'var(--font-m)',fontSize:'10px'}}>{s.scheduled_time?.slice(11,16)} {s.scheduled_time?.slice(5,10)}</td>
                         <td><span className={`rs-badge ${rsClass(s.report_status)}`}>{s.report_status}</span></td>
-                        <td>{s.critical_flag==1 && <span className="crit-flag">⚠</span>}</td>
+                        <td>{Number(s.critical_flag)===1 && <span className="crit-flag">⚠</span>}</td>
                       </tr>
                     ))}
                   </tbody>
