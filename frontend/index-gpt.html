@@ -1179,8 +1179,6 @@ function App() {
 
   // Report save
   const saveReport = async (forceStatus) => {
-    // Guard against React passing a click event when used as an onClick handler
-    if(forceStatus && typeof forceStatus !== 'string') forceStatus = undefined;
     if(!tok){ notify('Session expired — please log in again','err'); return; }
     if(!studyDetail){ notify('No study loaded','err'); return; }
     const sid = selectedStudy?.study_id || studyDetail?.study?.study_id || studyDetail?.study_id;
@@ -1510,7 +1508,7 @@ function App() {
                   </div>
                 </div>
                 <div className="rep-actions">
-                  <button className="rep-btn primary" onClick={()=>saveReport()}>💾 Save Report</button>
+                  <button className="rep-btn primary" onClick={saveReport}>💾 Save Report</button>
                   <button className="rep-btn primary" onClick={()=>saveReport('Final')}>✓ Sign & Finalise</button>
                   <button className="rep-btn secondary" onClick={()=>notify('Addendum mode — type in findings')}>+ Add Addendum</button>
                 </div>

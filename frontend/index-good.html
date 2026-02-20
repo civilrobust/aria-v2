@@ -937,8 +937,7 @@ function App() {
       if (!r.ok) throw new Error('Invalid username or password');
       const d = await r.json();
       setSession(d);
-      // Use the freshly issued token immediately (state update is async)
-      await ariaSpeak(`Welcome to ARIA, ${d.username}. Your radiology workbench is ready.`, d.token);
+      await ariaSpeak(`Welcome to ARIA, ${d.username}. Your radiology workbench is ready.`);
     } catch(e){ setLoginErr(e.message); }
     setLoginLoading(false);
   };
@@ -1077,9 +1076,8 @@ function App() {
         fd.append('audio', blob, 'recording.webm');
         try {
           const r = await fetch(`${API}/api/aria/transcribe?token=${tok}`, {method:'POST', body:fd});
-          if(!r.ok) throw new Error('Transcription failed');
           const d = await r.json();
-          const text = d.transcript?.trim();
+          const text = d.text?.trim();
           if(text) { setAriaCaptions('You said: "' + text + '"'); await ariaQuery(text); }
           else { setAriaCaptions('Nothing heard — try again'); setAriaState('idle'); }
         } catch(e) { setAriaCaptions('Transcription failed'); setAriaState('idle'); }
@@ -1099,14 +1097,7 @@ function App() {
 
   const toggleRecording = () => { if(isRecording) stopRecording(); else startRecording(); };
 
-  const ariaSpeak = async (text, tokenOverride) => {
-    const tkn = tokenOverride || tok;
-    if(!tkn){
-      // Not logged in (or token not yet in state) — fail gracefully.
-      setAriaCaptions(text);
-      setAriaState('idle');
-      return;
-    }
+  const ariaSpeak = async text => {
     if(ariaMuted){
       // Even muted, show word-by-word highlight using timing estimate
       const words = text.split(' ');
@@ -1126,7 +1117,7 @@ function App() {
     setAriaState('speaking');
     const words = text.split(' ');
     try {
-      const r = await fetch(`${API}/api/aria/speak?token=${tkn}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text,voice:ariaVoice})});
+      const r = await fetch(`${API}/api/aria/speak?token=${tok}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text,voice:ariaVoice})});
       if(!r.ok) throw new Error();
       const blob = await r.blob();
       const audio = new Audio(URL.createObjectURL(blob));
@@ -1179,45 +1170,20 @@ function App() {
 
   // Report save
   const saveReport = async (forceStatus) => {
-    // Guard against React passing a click event when used as an onClick handler
-    if(forceStatus && typeof forceStatus !== 'string') forceStatus = undefined;
-    if(!tok){ notify('Session expired — please log in again','err'); return; }
-    if(!studyDetail){ notify('No study loaded','err'); return; }
-    const sid = selectedStudy?.study_id || studyDetail?.study?.study_id || studyDetail?.study_id;
-    if(!sid){ notify('Unable to determine study ID','err'); return; }
+    if(!studyDetail) return;
     try {
       const existing = studyDetail.report;
       const payload = forceStatus ? {...report, sign_status: forceStatus} : report;
       if(forceStatus) setReport(r=>({...r, sign_status: forceStatus}));
-
-      if(existing?.report_id){
-        const r = await fetch(`${API}/api/report/${existing.report_id}?token=${tok}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-        if(!r.ok){
-          const t = await r.text();
-          throw new Error(`Save failed (${r.status}): ${t}`);
-        }
+      if(existing){
+        await fetch(`${API}/api/report/${existing.report_id}?token=${tok}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
       } else {
-        const r = await fetch(`${API}/api/report?token=${tok}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...payload,study_id:sid})});
-        if(!r.ok){
-          const t = await r.text();
-          throw new Error(`Save failed (${r.status}): ${t}`);
-        }
-        // Ensure subsequent saves use PUT
-        try {
-          const d = await r.json();
-          if(d?.report_id){
-            setStudyDetail(prev => prev ? ({...prev, report: {...(prev.report||{}), report_id: d.report_id, sign_status: payload.sign_status || prev.report?.sign_status || 'Draft'}}) : prev);
-          }
-        } catch {}
+        await fetch(`${API}/api/report?token=${tok}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...payload,study_id:selectedStudy.study_id})});
       }
-
       if(forceStatus==='Final') notify('Report signed and finalised ✓');
       else notify('Report saved successfully');
       loadReports();
-    } catch(e){
-      console.error(e);
-      notify('Failed to save report','err');
-    }
+    } catch(e){ notify('Failed to save report','err'); }
   };
 
   // AI assist report
@@ -1510,7 +1476,7 @@ function App() {
                   </div>
                 </div>
                 <div className="rep-actions">
-                  <button className="rep-btn primary" onClick={()=>saveReport()}>💾 Save Report</button>
+                  <button className="rep-btn primary" onClick={saveReport}>💾 Save Report</button>
                   <button className="rep-btn primary" onClick={()=>saveReport('Final')}>✓ Sign & Finalise</button>
                   <button className="rep-btn secondary" onClick={()=>notify('Addendum mode — type in findings')}>+ Add Addendum</button>
                 </div>
