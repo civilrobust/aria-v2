@@ -524,6 +524,43 @@ tbody td.primary{color:var(--text0);font-weight:600}
 .ai-impression-meta{display:flex;align-items:center;gap:8px;margin-top:10px;padding-top:8px;border-top:1px solid rgba(0,212,170,0.2)}
 .ai-impression-badge{background:rgba(0,212,170,0.12);border:1px solid rgba(0,212,170,0.3);color:#00d4aa;padding:2px 8px;border-radius:20px;font-size:9px;font-weight:700;letter-spacing:0.1em}
 .ai-speak-btn{background:rgba(0,212,170,0.1);border:1px solid rgba(0,212,170,0.3);color:#00d4aa;padding:3px 10px;border-radius:20px;font-size:9px;font-weight:700;cursor:pointer}
+
+/* ══════════════════════════════════════════ REPORTS */
+.reports-wrap{display:grid;grid-template-columns:340px 1fr;height:100%;overflow:hidden}
+.reports-list{background:var(--bg1);border-right:1px solid var(--border);overflow-y:auto;display:flex;flex-direction:column}
+.reports-list-header{padding:14px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
+.reports-list-title{font-family:var(--font-h);font-size:20px;font-style:italic;color:var(--text0)}
+.reports-list-sub{font-size:10px;color:var(--text2);letter-spacing:0.06em;margin-top:2px}
+.report-card{padding:14px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;position:relative}
+.report-card:hover{background:var(--bg-hover)}
+.report-card.active{background:var(--bg-active);border-left:3px solid var(--accent)}
+.rc-patient{font-size:13px;font-weight:700;color:var(--text0);margin-bottom:3px}
+.rc-meta{font-size:10px;color:var(--text2);font-family:var(--font-m);margin-bottom:4px}
+.rc-impression{font-size:10px;color:var(--text1);line-height:1.5;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.rc-badges{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.report-detail{background:var(--bg0);overflow-y:auto;padding:0}
+.rd-header{background:var(--bg1);padding:20px 28px;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10}
+.rd-patient-name{font-family:var(--font-h);font-size:28px;font-style:italic;color:var(--text0);margin-bottom:4px}
+.rd-meta-row{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:12px}
+.rd-meta-field{display:flex;flex-direction:column;gap:1px}
+.rd-meta-label{font-size:8px;color:var(--text2);letter-spacing:0.1em;text-transform:uppercase}
+.rd-meta-value{font-size:12px;color:var(--text0);font-family:var(--font-m);font-weight:600}
+.rd-signed-banner{display:flex;align-items:center;gap:10px;background:rgba(0,145,77,0.1);border:1px solid rgba(0,145,77,0.3);border-radius:8px;padding:10px 16px}
+.rd-signed-icon{font-size:20px}
+.rd-signed-text{font-size:11px;color:var(--ok);font-weight:700;letter-spacing:0.06em}
+.rd-signed-sub{font-size:10px;color:var(--text2);margin-top:1px}
+.rd-body{padding:24px 28px}
+.rd-section{margin-bottom:24px}
+.rd-section-label{font-size:9px;font-weight:900;letter-spacing:0.2em;color:var(--text2);text-transform:uppercase;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.rd-section-text{font-family:var(--font-m);font-size:12px;color:var(--text1);line-height:1.8;white-space:pre-wrap}
+.rd-ai-section{background:rgba(0,20,40,0.8);border:1px solid rgba(0,212,170,0.35);border-radius:10px;padding:18px;margin-bottom:24px;position:relative}
+.rd-ai-section::before{content:"◈ AI ASSISTED IMPRESSION";position:absolute;top:-10px;left:14px;background:var(--bg0);padding:0 8px;font-size:9px;font-weight:900;letter-spacing:0.2em;color:#00d4aa}
+.rd-ai-text{font-family:'Courier New',monospace;font-size:13px;line-height:1.9;color:#e0fff8}
+.rd-ai-footer{display:flex;align-items:center;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid rgba(0,212,170,0.2)}
+.rd-print-btn{background:var(--nhs2);color:white;padding:10px 20px;border-radius:8px;font-size:11px;font-weight:700;letter-spacing:0.08em;transition:all .2s;border:none}
+.rd-print-btn:hover{background:#003f9e}
+.rd-speak-btn{background:rgba(0,212,170,0.1);border:1px solid rgba(0,212,170,0.3);color:#00d4aa;padding:10px 16px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer}
+.no-reports{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--text2)}
 </style>
 </head>
 <body>
@@ -880,6 +917,8 @@ function App() {
   const [genLoading,setGenLoading] = useState(false);
   const [importResult,setImportResult] = useState('');
   const [notif,setNotif] = useState(null);
+  const [reports,setReports] = useState([]);
+  const [selectedReport,setSelectedReport] = useState(null);
   const [viewerTool,setViewerTool] = useState('pan');
   const fileRef = useRef();
   const captionsRef = useRef();
@@ -925,7 +964,16 @@ function App() {
     } catch{}
   },[tok]);
 
-  useEffect(()=>{ if(tok){ loadWorklist(); loadStats(); } },[tok,filter]);
+  const loadReports = useCallback(async () => {
+    if (!tok) return;
+    try {
+      const r = await fetch(`${API}/api/reports?token=${tok}`);
+      const d = await r.json();
+      setReports(d.reports || []);
+    } catch{}
+  },[tok]);
+
+  useEffect(()=>{ if(tok){ loadWorklist(); loadStats(); loadReports(); } },[tok,filter]);
 
   // Auto-scroll captions to keep highlighted word visible
   useEffect(()=>{
@@ -1121,16 +1169,20 @@ function App() {
   };
 
   // Report save
-  const saveReport = async () => {
+  const saveReport = async (forceStatus) => {
     if(!studyDetail) return;
     try {
       const existing = studyDetail.report;
+      const payload = forceStatus ? {...report, sign_status: forceStatus} : report;
+      if(forceStatus) setReport(r=>({...r, sign_status: forceStatus}));
       if(existing){
-        await fetch(`${API}/api/report/${existing.report_id}?token=${tok}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(report)});
+        await fetch(`${API}/api/report/${existing.report_id}?token=${tok}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
       } else {
-        await fetch(`${API}/api/report?token=${tok}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...report,study_id:selectedStudy.study_id})});
+        await fetch(`${API}/api/report?token=${tok}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...payload,study_id:selectedStudy.study_id})});
       }
-      notify('Report saved successfully');
+      if(forceStatus==='Final') notify('Report signed and finalised ✓');
+      else notify('Report saved successfully');
+      loadReports();
     } catch(e){ notify('Failed to save report','err'); }
   };
 
@@ -1212,6 +1264,7 @@ function App() {
   const RAIL_ITEMS = [
     {id:'worklist',icon:'☰',label:'List'},
     {id:'viewer',icon:'⬜',label:'Viewer'},
+    {id:'reports',icon:'📋',label:'Reports'},
     {id:'analytics',icon:'▦',label:'Stats'},
     {id:'import',icon:'↑',label:'I/O'},
     {id:'generator',icon:'⚙',label:'Gen'},
@@ -1424,7 +1477,7 @@ function App() {
                 </div>
                 <div className="rep-actions">
                   <button className="rep-btn primary" onClick={saveReport}>💾 Save Report</button>
-                  <button className="rep-btn primary" onClick={()=>{setReport(r=>({...r,sign_status:'Final'}));saveReport();notify('Report signed and finalised')}}>✓ Sign & Finalise</button>
+                  <button className="rep-btn primary" onClick={()=>saveReport('Final')}>✓ Sign & Finalise</button>
                   <button className="rep-btn secondary" onClick={()=>notify('Addendum mode — type in findings')}>+ Add Addendum</button>
                 </div>
               </div>
@@ -1432,7 +1485,95 @@ function App() {
           )
         )}
 
-        {/* ── ANALYTICS ── */}
+        {/* ── REPORTS ── */}
+        {nav==='reports' && (
+          <div className="reports-wrap">
+            <div className="reports-list">
+              <div className="reports-list-header">
+                <div className="reports-list-title">Signed Reports</div>
+                <div className="reports-list-sub">{reports.length} REPORTS IN SYSTEM</div>
+              </div>
+              {reports.length===0 ? (
+                <div className="no-reports" style={{padding:'40px',textAlign:'center'}}>
+                  <div style={{fontSize:'32px',marginBottom:'12px',opacity:0.3}}>📋</div>
+                  <div style={{opacity:0.4}}>No reports yet</div>
+                  <div style={{fontSize:'11px',marginTop:'8px',opacity:0.3}}>Sign and save reports from the Viewer</div>
+                </div>
+              ) : reports.map(rep=>(
+                <div key={rep.report_id} className={`report-card ${selectedReport?.report_id===rep.report_id?'active':''}`} onClick={()=>setSelectedReport(rep)}>
+                  <div className="rc-patient">{rep.last_name}, {rep.first_name}</div>
+                  <div className="rc-meta">{rep.mrn} · {rep.modality} {rep.body_part} · {fmtDate(rep.signed_at||rep.updated_at)}</div>
+                  <div className="rc-impression">{rep.impression?.replace(/\*\*([^*]+)\*\*/g,'$1').slice(0,120)}...</div>
+                  <div className="rc-badges">
+                    <span className={`rs-badge ${rep.sign_status==='Final'?'rs-F':rep.sign_status==='Preliminary'?'rs-P':'rs-D'}`}>{rep.sign_status||'Draft'}</span>
+                    <span className={`mod-tag m-${rep.modality}`}>{rep.modality}</span>
+                    {rep.ai_assisted && <span className="ai-impression-badge" style={{fontSize:'8px'}}>⚕ AI ASSISTED</span>}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="report-detail">
+              {!selectedReport ? (
+                <div className="no-reports">
+                  <div style={{fontSize:'48px',marginBottom:'16px',opacity:0.15}}>📄</div>
+                  <div style={{fontFamily:'var(--font-h)',fontSize:'20px',fontStyle:'italic',opacity:0.3}}>Select a report</div>
+                  <div style={{fontSize:'12px',marginTop:'8px',opacity:0.2}}>Click a report from the list to view full details</div>
+                </div>
+              ) : (
+                <div>
+                  <div className="rd-header">
+                    <div className="rd-patient-name">{selectedReport.last_name}, {selectedReport.first_name}</div>
+                    <div className="rd-meta-row">
+                      <div className="rd-meta-field"><div className="rd-meta-label">MRN</div><div className="rd-meta-value">{selectedReport.mrn}</div></div>
+                      <div className="rd-meta-field"><div className="rd-meta-label">Modality</div><div className="rd-meta-value">{selectedReport.modality} · {selectedReport.body_part}</div></div>
+                      <div className="rd-meta-field"><div className="rd-meta-label">Accession</div><div className="rd-meta-value">{selectedReport.accession}</div></div>
+                      <div className="rd-meta-field"><div className="rd-meta-label">Report Date</div><div className="rd-meta-value">{fmt(selectedReport.updated_at)}</div></div>
+                    </div>
+                    <div className="rd-signed-banner">
+                      <div className="rd-signed-icon">{selectedReport.sign_status==='Final'?'✅':'📝'}</div>
+                      <div>
+                        <div className="rd-signed-text">{selectedReport.sign_status==='Final'?'SIGNED & FINALISED':'PRELIMINARY REPORT'} · {selectedReport.sign_status?.toUpperCase()}</div>
+                        <div className="rd-signed-sub">King's College Hospital NHS Foundation Trust · Radiology Department · Denmark Hill SE5</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="rd-body">
+                    {selectedReport.indication && <div className="rd-section">
+                      <div className="rd-section-label">Clinical Indication</div>
+                      <div className="rd-section-text">{selectedReport.indication}</div>
+                    </div>}
+                    {selectedReport.technique && <div className="rd-section">
+                      <div className="rd-section-label">Technique</div>
+                      <div className="rd-section-text">{selectedReport.technique}</div>
+                    </div>}
+                    {selectedReport.findings && <div className="rd-section">
+                      <div className="rd-section-label">Findings</div>
+                      <div className="rd-section-text">{selectedReport.findings}</div>
+                    </div>}
+                    {selectedReport.impression && <div className="rd-ai-section">
+                      <div className="rd-ai-text" dangerouslySetInnerHTML={{__html: (selectedReport.impression||'')
+                        .replace(/\*\*([^*]+)\*\*/g,'<strong style="color:#00ffcc;font-size:14px">$1</strong>')
+                        .replace(/^- /gm,'• ')
+                        .replace(/\n/g,'<br/>')
+                      }}/>
+                      <div className="rd-ai-footer">
+                        <span className="ai-impression-badge">⚕ AI ASSISTED</span>
+                        <span className="ai-impression-badge" style={{color:'#ff9900',borderColor:'rgba(255,153,0,0.3)'}}>REQUIRES CLINICAL REVIEW</span>
+                        <button className="rd-speak-btn" onClick={()=>ariaSpeak(selectedReport.impression.replace(/\*\*([^*]+)\*\*/g,'$1'))}>🔊 Read Aloud</button>
+                      </div>
+                    </div>}
+                    <div style={{display:'flex',gap:'10px',marginTop:'8px'}}>
+                      <button className="rd-print-btn" onClick={()=>window.print()}>🖨 Print Report</button>
+                      <button className="rd-speak-btn" onClick={()=>ariaSpeak(`Report for ${selectedReport.first_name} ${selectedReport.last_name}. ${selectedReport.findings||''} ${selectedReport.impression?.replace(/\*\*([^*]+)\*\*/g,'$1')||''}`)}>🔊 Read Full Report</button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ── ANALYTICS ── */}}
         {nav==='analytics' && (
           <div className="analytics-wrap">
             <div className="a-title">Department Analytics</div>
@@ -1660,7 +1801,7 @@ function App() {
           </div>
 
           {/* Captions */}
-          <div className="aria-captions" ref={captionsRef} dangerouslySetInnerHTML={{__html: typeof ariaCaptions === "string" ? ariaCaptions : ariaCaptions}}/>
+          <div className="aria-captions" ref={captionsRef} dangerouslySetInnerHTML={{__html: String(ariaCaptions||"")}} />
         </div>
         <div className="aria-chat">
           {ariaMessages.map((m,i)=>(

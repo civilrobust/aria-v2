@@ -327,6 +327,21 @@ async def create_report(data: dict, token: str):
     db.commit(); db.close()
     return {"report_id": rid, "message": "Report saved"}
 
+@app.get("/api/reports")
+async def get_reports(token: str):
+    verify_token(token)
+    db = sqlite3.connect("aria.db", check_same_thread=False)
+    cur = db.execute("""
+        SELECT r.*, p.first_name, p.last_name, p.mrn, s.modality, s.body_part, s.accession
+        FROM reports r
+        JOIN studies s ON r.study_id = s.study_id
+        JOIN patients p ON s.patient_id = p.patient_id
+        ORDER BY r.updated_at DESC
+    """)
+    rows = [dict(zip([c[0] for c in cur.description], row)) for row in cur.fetchall()]
+    db.close()
+    return {"reports": rows}
+
 @app.put("/api/report/{report_id}")
 async def update_report(report_id: str, data: dict, token: str):
     verify_token(token)
@@ -508,6 +523,8 @@ async def ws_live(websocket: WebSocket):
             await asyncio.sleep(10)
     except WebSocketDisconnect:
         pass
+
+
 
 if __name__ == "__main__":
     import uvicorn
