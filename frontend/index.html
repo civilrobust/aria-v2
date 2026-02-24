@@ -156,7 +156,7 @@ input,textarea{outline:none}
 .rail-divider{width:32px;height:1px;background:var(--border);margin:4px 0}
 
       /* ── WORKSPACE ── */
-.workspace{background:var(--bg0);overflow:hidden;display:flex;flex-direction:column;margin-right:290px}
+.workspace{background:var(--bg0);overflow:hidden;display:flex;flex-direction:column;margin-right:320px}
 
 /* ══════════════════════════════════════════ WORKLIST */
 .wl-wrap{display:grid;grid-template-rows:auto 1fr;height:100%;overflow:hidden}
@@ -334,16 +334,9 @@ tbody td.primary{color:var(--text0);font-weight:600}
 .aria-state.thinking .state-dot{animation:mpr 1.2s ease-in-out infinite}
 
 /* Waveform visualiser */
-.aria-waveform{
-  display:flex;align-items:center;justify-content:center;gap:3px;
-  height:28px;width:100%;margin-bottom:8px;
-}
-.wave-bar{
-  width:3px;border-radius:2px;background:var(--accent);opacity:0.5;
-  transition:height .1s ease,opacity .1s ease;
-  min-height:3px;
-}
-.aria-waveform.active .wave-bar{opacity:0.9}
+.aria-waveform{display:flex;align-items:center;justify-content:center;gap:3px;height:34px;width:100%;margin-bottom:8px}
+.wave-bar{width:3px;border-radius:2px;background:var(--accent);opacity:0.5;transition:height 0.05s ease,opacity 0.1s ease;min-height:3px}
+.aria-waveform.active .wave-bar{opacity:0.92}
 .aria-waveform.thinking .wave-bar{background:#b090ff;animation:think-wave 1.2s ease-in-out infinite}
 @keyframes think-wave{0%,100%{height:4px;opacity:0.3}50%{height:16px;opacity:0.8}}
 
@@ -375,24 +368,37 @@ tbody td.primary{color:var(--text0);font-weight:600}
 
 /* Captions */
 .aria-captions{
-  background:rgba(0,0,0,0.45);border-radius:10px;padding:12px 14px;
-  font-size:13px;color:#c8e6ff;font-family:var(--font-m);font-weight:400;
-  line-height:1.9;min-height:100px;border:1px solid rgba(0,170,255,0.2);width:100%;
-  font-style:italic;height:220px;overflow-y:auto;word-wrap:break-word;word-break:break-word;
-  letter-spacing:0.01em;
+  border-radius:10px;font-size:12.5px;color:#c8e6ff;font-family:var(--font-m);font-weight:400;
+  line-height:1.8;width:100%;font-style:italic;overflow:hidden;
+  word-wrap:break-word;word-break:break-word;letter-spacing:0.01em;
+  max-height:0;padding:0 14px;border:1px solid transparent;background:transparent;
+  transition:max-height 0.3s ease,padding 0.3s ease,border-color 0.3s ease,background 0.3s ease;
 }
-[data-theme="light"] .aria-captions{background:rgba(0,30,80,0.04);color:var(--text1)}
-.aria-chat{flex:1;overflow-y:auto;padding:10px}
+.aria-captions.active{
+  max-height:110px;padding:10px 14px;overflow-y:auto;
+  border-color:rgba(0,170,255,0.2);background:rgba(0,0,0,0.45);
+}
+[data-theme="light"] .aria-captions.active{background:rgba(0,30,80,0.04);color:var(--text1)}
+.aria-chat{flex:1;overflow-y:auto;padding:12px 10px;display:flex;flex-direction:column;gap:8px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
+.aria-chat::-webkit-scrollbar{width:5px}
+.aria-chat::-webkit-scrollbar-track{background:transparent}
+.aria-chat::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
 .aria-input-row{padding:8px 10px;border-top:1px solid var(--border);display:flex;gap:6px}
 .aria-input{flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text0);font-size:12px;font-family:var(--font-s)}
 .aria-input:focus{border-color:var(--border2)}
 .aria-input::placeholder{color:var(--text2)}
 .aria-send{background:var(--nhs2);color:white;border-radius:8px;padding:7px 12px;font-size:11px;font-weight:700;transition:all .2s}
 .aria-send:hover{background:#003f9e}
-.msg{margin-bottom:10px;display:flex;flex-direction:column;gap:3px}
-.msg-role{font-size:8px;font-weight:700;letter-spacing:0.1em;color:var(--text2);text-transform:uppercase}
-.msg-body{font-size:11px;color:var(--text1);line-height:1.6;padding:8px 10px;border-radius:8px;background:var(--bg2);border:1px solid var(--border)}
-.msg.aria .msg-body{background:var(--bg-active);border-color:var(--border2);color:var(--text0)}
+/* Chat bubbles */
+.msg{display:flex;flex-direction:column;max-width:88%}
+.msg.user{align-self:flex-end;align-items:flex-end}
+.msg.aria{align-self:flex-start;align-items:flex-start}
+.msg-role{font-size:8px;font-weight:700;letter-spacing:0.1em;color:var(--text2);text-transform:uppercase;margin-bottom:3px;padding:0 4px}
+.msg-body{font-size:11.5px;line-height:1.6;padding:9px 12px;border-radius:14px;word-break:break-word}
+.msg.user .msg-body{background:var(--nhs2);color:#fff;border-bottom-right-radius:4px}
+.msg.aria .msg-body{background:var(--bg2);border:1px solid var(--border2);color:var(--text0);border-bottom-left-radius:4px}
+[data-theme="light"] .msg.user .msg-body{background:var(--nhs2);color:#fff}
+[data-theme="light"] .msg.aria .msg-body{background:#f0f4ff;border-color:#c0ccee;color:#111}
 
 /* ══════════════════════════════════════════ GENERATOR */
 .gen-wrap{padding:24px;overflow-y:auto;height:100%}
@@ -536,7 +542,7 @@ tbody td.primary{color:var(--text0);font-weight:600}
 .report-card.active{background:var(--bg-active);border-left:3px solid var(--accent)}
 .rc-patient{font-size:13px;font-weight:700;color:var(--text0);margin-bottom:3px}
 .rc-meta{font-size:10px;color:var(--text2);font-family:var(--font-m);margin-bottom:4px}
-.rc-impression{font-size:10px;color:var(--text1);line-height:1.5;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.rc-impression{font-size:10px;color:var(--text1);line-height:1.5;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical}
 .rc-badges{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
 .report-detail{background:var(--bg0);overflow-y:auto;padding:0}
 .rd-header{background:var(--bg1);padding:20px 28px;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10}
@@ -922,11 +928,27 @@ function App() {
   const [viewerTool,setViewerTool] = useState('pan');
   const fileRef = useRef();
   const captionsRef = useRef();
+  const chatRef = useRef();
+  useEffect(()=>{
+    if(chatRef.current) chatRef.current.scrollTop = chatRef.current.scrollHeight;
+  }, [ariaMessages]);
 
   useEffect(()=>{ document.documentElement.setAttribute('data-theme',theme); },[theme]);
 
   const notify = (msg,type='ok') => { setNotif({msg,type}); };
   const tok = session?.token;
+
+  const tokRef       = React.useRef(null);
+  const ariaMutedRef = React.useRef(false);
+  const ariaVoiceRef = React.useRef('nova');
+  React.useEffect(()=>{ tokRef.current=tok; },            [tok]);
+  React.useEffect(()=>{ ariaMutedRef.current=ariaMuted; },[ariaMuted]);
+  React.useEffect(()=>{ ariaVoiceRef.current=ariaVoice; },[ariaVoice]);
+
+  const [waveLevels, setWaveLevels] = React.useState(Array(18).fill(3));
+  const waveRafRef  = React.useRef(null);
+  const audioCtxRef = React.useRef(null);
+  const analyserRef = React.useRef(null);
 
   // Login
   const handleLogin = async e => {
@@ -1000,182 +1022,151 @@ function App() {
     } catch(e){ console.error(e); }
   };
 
-  // ARIA speak
-    // ── MICROPHONE — Web Speech API (live transcription) ─────────
-  const recognitionRef = React.useRef(null);
-  const mediaRecorderRef = React.useRef(null);
-  const audioChunksRef = React.useRef([]);
-  const liveTextRef = React.useRef('');
+  // ── Waveform ──────────────────────────────────────────────────────
+  const stopWaveform = () => {
+    if(waveRafRef.current){ cancelAnimationFrame(waveRafRef.current); waveRafRef.current=null; }
+    analyserRef.current=null;
+    if(audioCtxRef.current){ try{audioCtxRef.current.close();}catch(_){} audioCtxRef.current=null; }
+    setWaveLevels(Array(18).fill(3));
+  };
+  const startWaveform = (stream) => {
+    stopWaveform();
+    try {
+      const ctx=new(window.AudioContext||window.webkitAudioContext)();
+      const src=ctx.createMediaStreamSource(stream);
+      const an=ctx.createAnalyser(); an.fftSize=128; an.smoothingTimeConstant=0.65;
+      src.connect(an); audioCtxRef.current=ctx; analyserRef.current=an;
+      const buf=new Uint8Array(an.frequencyBinCount);
+      const tick=()=>{
+        if(!analyserRef.current) return;
+        an.getByteFrequencyData(buf);
+        setWaveLevels(Array.from({length:18},(_,i)=>Math.max(3,Math.min(34,3+(buf[Math.floor(i*buf.length/18)]/255)*31))));
+        waveRafRef.current=requestAnimationFrame(tick);
+      };
+      waveRafRef.current=requestAnimationFrame(tick);
+    } catch(_){}
+  };
+
+  // ── ARIA SPEAK ────────────────────────────────────────────────────
+  const wordHL=(words,idx)=>words.map((w,j)=>
+    j<idx  ?`<span style="color:var(--text2)">${w}</span>`:
+    j===idx?`<span style="color:#00d4aa;font-weight:700;text-shadow:0 0 8px rgba(0,212,170,0.6)">${w}</span>`:
+            `<span>${w}</span>`
+  ).join(' ');
+
+  const ariaSpeak = async (text, tokenOverride) => {
+    const tkn=tokenOverride||tokRef.current;
+    const words=text.split(' ');
+    if(!tkn){ setAriaCaptions(text); setAriaState('idle'); return; }
+    setAriaState('speaking');
+    const animWords=ms=>new Promise(res=>{
+      let i=0;
+      const iv=setInterval(()=>{ setAriaCaptions(wordHL(words,i)); i++; if(i>=words.length){clearInterval(iv);res();} },Math.max(60,ms/words.length));
+    });
+    if(ariaMutedRef.current){ await animWords(words.length*120); setAriaState('idle'); setAriaCaptions(text); return; }
+    try {
+      const r=await fetch(`${API}/api/aria/speak?token=${tkn}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text,voice:ariaVoiceRef.current})});
+      if(!r.ok) throw new Error();
+      const blob=await r.blob(); const url=URL.createObjectURL(blob);
+      const audio=new Audio(url);
+      const dur=await new Promise(res=>{ audio.onloadedmetadata=()=>res(audio.duration*1000); audio.onerror=()=>res(words.length*150); setTimeout(()=>res(words.length*150),4000); });
+      const animDone=animWords(dur);
+      audio.play().catch(()=>{});
+      await new Promise(res=>{audio.onended=res; audio.onerror=res;});
+      await animDone; URL.revokeObjectURL(url);
+    } catch { await animWords(words.length*150); }
+    setAriaState('idle'); setAriaCaptions(text);
+  };
+
+  // ── ARIA QUERY ────────────────────────────────────────────────────
+  const ariaQuery = async (q, tokenOverride) => {
+    const tkn=tokenOverride||tokRef.current;
+    if(!q||!q.trim()) return;
+    setAriaMessages(m=>[...m,{role:'user',body:q}]);
+    setAriaInput(''); setAriaState('thinking'); setAriaCaptions('Thinking...');
+    try {
+      const r=await fetch(`${API}/api/aria/query?token=${tkn}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:q})});
+      if(!r.ok) throw new Error(`${r.status}`);
+      const d=await r.json();
+      const reply=d.response||'No response from ARIA.';
+      setAriaMessages(m=>[...m,{role:'aria',body:reply}]);
+      await ariaSpeak(reply, tkn);
+    } catch {
+      const msg='ARIA is temporarily unavailable. Please try again.';
+      setAriaMessages(m=>[...m,{role:'aria',body:msg}]);
+      setAriaCaptions(msg); setAriaState('idle');
+    }
+  };
+
+  // ── MICROPHONE — MediaRecorder → Whisper ─────────────────────────
+  const recorderRef = React.useRef(null);
+  const chunksRef   = React.useRef([]);
+  const streamRef   = React.useRef(null);
+  const vadRef      = React.useRef(null);
+  const sessionRef  = React.useRef(0);
+
+  const cleanupMic = () => {
+    if(vadRef.current){ clearInterval(vadRef.current); vadRef.current=null; }
+    if(recorderRef.current && recorderRef.current.state!=='inactive'){ try{recorderRef.current.stop();}catch(_){} }
+    recorderRef.current=null;
+    if(streamRef.current){ streamRef.current.getTracks().forEach(t=>{try{t.stop();}catch(_){}}); streamRef.current=null; }
+    stopWaveform();
+  };
 
   const startRecording = async () => {
-    liveTextRef.current = '';
-
-    // Try Web Speech API first (live transcription in browser)
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if(SpeechRecognition) {
-      const recognition = new SpeechRecognition();
-      recognition.continuous = true;
-      recognition.interimResults = true;
-      recognition.lang = 'en-GB';
-      recognitionRef.current = recognition;
-
-      recognition.onstart = () => {
-        setIsRecording(true);
-        setAriaState('listening');
-        setAriaCaptions('🎙 Listening — speak now...');
-      };
-
-      recognition.onresult = (event) => {
-        let interim = '';
-        let final = '';
-        for(let i = event.resultIndex; i < event.results.length; i++) {
-          const t = event.results[i][0].transcript;
-          if(event.results[i].isFinal) { final += t; }
-          else { interim += t; }
-        }
-        if(final) liveTextRef.current += final;
-        const display = liveTextRef.current + (interim ? ' ' + interim : '');
-        setAriaCaptions('🎙 ' + display);
-      };
-
-      recognition.onerror = (e) => {
-        setAriaCaptions('Mic error: ' + e.error + ' — try typing instead');
-        setAriaState('idle');
-        setIsRecording(false);
-      };
-
-      recognition.onend = () => {
-        setIsRecording(false);
-        const text = liveTextRef.current.trim();
-        if(text) {
-          setAriaCaptions('You said: "' + text + '"');
-          ariaQuery(text);
-        } else {
-          setAriaCaptions('Nothing heard — tap TAP TO TALK and try again');
-          setAriaState('idle');
-        }
-      };
-
-      recognition.start();
-      return;
-    }
-
-    // Fallback: MediaRecorder + Whisper
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({audio:true});
-      audioChunksRef.current = [];
-      const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/ogg';
-      const recorder = new MediaRecorder(stream, {mimeType});
-      mediaRecorderRef.current = recorder;
-      recorder.ondataavailable = e => { if(e.data.size>0) audioChunksRef.current.push(e.data); };
-      recorder.onstop = async () => {
-        stream.getTracks().forEach(t=>t.stop());
-        setAriaState('thinking');
-        setAriaCaptions('Transcribing via Whisper...');
-        const blob = new Blob(audioChunksRef.current, {type:mimeType});
-        const fd = new FormData();
-        fd.append('audio', blob, 'recording.webm');
-        try {
-          const r = await fetch(`${API}/api/aria/transcribe?token=${tok}`, {method:'POST', body:fd});
-          if(!r.ok) throw new Error('Transcription failed');
-          const d = await r.json();
-          const text = d.transcript?.trim();
-          if(text) { setAriaCaptions('You said: "' + text + '"'); await ariaQuery(text); }
-          else { setAriaCaptions('Nothing heard — try again'); setAriaState('idle'); }
-        } catch(e) { setAriaCaptions('Transcription failed'); setAriaState('idle'); }
-      };
-      recorder.start();
-      setIsRecording(true);
-      setAriaState('listening');
-      setAriaCaptions('🎙 Listening via Whisper... tap STOP when done');
-    } catch(e) { setAriaCaptions('Microphone access denied — check browser permissions'); setAriaState('idle'); }
+    cleanupMic();
+    const mySession = ++sessionRef.current;
+    let stream;
+    try { stream=await navigator.mediaDevices.getUserMedia({audio:true,video:false}); }
+    catch { setAriaCaptions('Microphone access denied — check browser permissions'); setAriaState('idle'); return; }
+    if(mySession!==sessionRef.current){ stream.getTracks().forEach(t=>t.stop()); return; }
+    streamRef.current=stream;
+    startWaveform(stream);
+    setIsRecording(true); setAriaState('listening'); setAriaCaptions('🎙 Listening — speak now...');
+    chunksRef.current=[];
+    const mimeType=MediaRecorder.isTypeSupported('audio/webm;codecs=opus')?'audio/webm;codecs=opus'
+                  :MediaRecorder.isTypeSupported('audio/webm')?'audio/webm':'audio/ogg';
+    const recorder=new MediaRecorder(stream,{mimeType});
+    recorderRef.current=recorder;
+    recorder.ondataavailable=e=>{ if(e.data.size>0) chunksRef.current.push(e.data); };
+    recorder.onstop=async()=>{
+      if(mySession!==sessionRef.current) return;
+      recorderRef.current=null;
+      if(streamRef.current){ streamRef.current.getTracks().forEach(t=>t.stop()); streamRef.current=null; }
+      stopWaveform(); setIsRecording(false);
+      const blob=new Blob(chunksRef.current,{type:mimeType});
+      if(blob.size<500){ setAriaCaptions('Nothing recorded — tap TAP TO TALK and try again'); setAriaState('idle'); return; }
+      setAriaState('thinking'); setAriaCaptions('Transcribing...');
+      const fd=new FormData(); fd.append('audio',blob,'recording.webm');
+      try {
+        const r=await fetch(`${API}/api/aria/transcribe?token=${tokRef.current}`,{method:'POST',body:fd});
+        if(!r.ok) throw new Error(`${r.status}`);
+        const d=await r.json();
+        const text=(d.transcript||d.text||'').trim();
+        if(text){ setAriaCaptions(`You said: "${text}"`); await ariaQuery(text); }
+        else { setAriaCaptions('Nothing heard — tap TAP TO TALK and try again'); setAriaState('idle'); }
+      } catch { setAriaCaptions('Transcription failed — check server connection'); setAriaState('idle'); }
+    };
+    recorder.start(250);
+    let silenceMs=0, hasSpeech=false;
+    vadRef.current=setInterval(()=>{
+      if(!analyserRef.current||mySession!==sessionRef.current){ clearInterval(vadRef.current); return; }
+      const buf=new Uint8Array(analyserRef.current.frequencyBinCount);
+      analyserRef.current.getByteFrequencyData(buf);
+      const avg=buf.reduce((a,b)=>a+b,0)/buf.length;
+      if(avg>10) hasSpeech=true;
+      silenceMs=avg<8?silenceMs+250:0;
+      if(hasSpeech&&silenceMs>=2000){ clearInterval(vadRef.current); vadRef.current=null; if(recorder.state!=='inactive') recorder.stop(); }
+    },250);
   };
 
   const stopRecording = () => {
-    if(recognitionRef.current) { recognitionRef.current.stop(); recognitionRef.current = null; }
-    if(mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') mediaRecorderRef.current.stop();
-    setIsRecording(false);
+    if(vadRef.current){ clearInterval(vadRef.current); vadRef.current=null; }
+    if(recorderRef.current&&recorderRef.current.state!=='inactive'){ recorderRef.current.stop(); }
+    else { cleanupMic(); setIsRecording(false); setAriaState('idle'); setAriaCaptions('Cancelled — tap TAP TO TALK to try again'); }
   };
 
   const toggleRecording = () => { if(isRecording) stopRecording(); else startRecording(); };
-
-  const ariaSpeak = async (text, tokenOverride) => {
-    const tkn = tokenOverride || tok;
-    if(!tkn){
-      // Not logged in (or token not yet in state) — fail gracefully.
-      setAriaCaptions(text);
-      setAriaState('idle');
-      return;
-    }
-    if(ariaMuted){
-      // Even muted, show word-by-word highlight using timing estimate
-      const words = text.split(' ');
-      let i = 0;
-      const iv = setInterval(()=>{
-        if(i >= words.length){ clearInterval(iv); setAriaState('idle'); return; }
-        const highlighted = words.map((w,j)=>
-          j < i ? `<span style="color:var(--text2)">${w}</span>` :
-          j === i ? `<span style="color:#00d4aa;font-weight:700;text-shadow:0 0 8px rgba(0,212,170,0.6)">${w}</span>` :
-          `<span>${w}</span>`
-        ).join(' ');
-        setAriaCaptions(highlighted);
-        i++;
-      }, 120);
-      return;
-    }
-    setAriaState('speaking');
-    const words = text.split(' ');
-    try {
-      const r = await fetch(`${API}/api/aria/speak?token=${tkn}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text,voice:ariaVoice})});
-      if(!r.ok) throw new Error();
-      const blob = await r.blob();
-      const audio = new Audio(URL.createObjectURL(blob));
-      const duration = await new Promise(res => {
-        audio.onloadedmetadata = () => res(audio.duration * 1000);
-        audio.onerror = () => res(words.length * 120);
-      });
-      const msPerWord = duration / words.length;
-      let i = 0;
-      const iv = setInterval(()=>{
-        if(i >= words.length){ clearInterval(iv); return; }
-        const highlighted = words.map((w,j)=>
-          j < i ? `<span style="color:var(--text2)">${w}</span>` :
-          j === i ? `<span style="color:#00d4aa;font-weight:700;text-shadow:0 0 8px rgba(0,212,170,0.6)">${w}</span>` :
-          `<span>${w}</span>`
-        ).join(' ');
-        setAriaCaptions(highlighted);
-        i++;
-      }, msPerWord);
-      audio.onended = ()=>{ clearInterval(iv); setAriaState('idle'); setAriaCaptions(text); };
-      await audio.play();
-    } catch { 
-      let i = 0;
-      const iv = setInterval(()=>{
-        if(i >= words.length){ clearInterval(iv); setAriaState('idle'); setAriaCaptions(text); return; }
-        const highlighted = words.map((w,j)=>
-          j < i ? `<span style="color:var(--text2)">${w}</span>` :
-          j === i ? `<span style="color:#00d4aa;font-weight:700;text-shadow:0 0 8px rgba(0,212,170,0.6)">${w}</span>` :
-          `<span>${w}</span>`
-        ).join(' ');
-        setAriaCaptions(highlighted);
-        i++;
-      }, 120);
-    }
-  };
-
-  // ARIA text query
-  const ariaQuery = async q => {
-    if(!q.trim()) return;
-    setAriaMessages(m=>[...m,{role:'user',body:q}]);
-    setAriaInput('');
-    setAriaState('thinking');
-    setAriaCaptions('Processing your query...');
-    try {
-      const r = await fetch(`${API}/api/aria/query?token=${tok}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:q})});
-      const d = await r.json();
-      await ariaSpeak(d.response);
-    } catch(e){ setAriaMessages(m=>[...m,{role:'aria',body:'ARIA is temporarily unavailable. Please try again.'}]); setAriaState('idle'); }
-  };
 
   // Report save
   const saveReport = async (forceStatus) => {
@@ -1607,7 +1598,7 @@ function App() {
           </div>
         )}
 
-        {/* ── ANALYTICS ── */}}
+        {/* ── ANALYTICS ── */}
         {nav==='analytics' && (
           <div className="analytics-wrap">
             <div className="a-title">Department Analytics</div>
@@ -1784,7 +1775,7 @@ function App() {
       </div>{/* end workspace */}
 
       {/* ARIA SIDE PANEL (always visible) */}
-      <div className="aria-panel" style={{position:'fixed',right:0,top:'var(--header)',bottom:0,width:'290px',zIndex:50,borderLeft:'1px solid var(--border)',display:'flex',flexDirection:'column'}}>
+      <div className="aria-panel" style={{position:'fixed',right:0,top:'var(--header)',bottom:0,width:'320px',zIndex:50,borderLeft:'1px solid var(--border)',display:'flex',flexDirection:'column'}}>
         <div className="aria-avatar-area">
           <div className="aria-face-wrap"><AriaFace state={ariaState}/></div>
           <div className="aria-name">ARIA</div>
@@ -1798,18 +1789,15 @@ function App() {
             </div>
           </div>
 
-          {/* Waveform visualiser */}
+          {/* Waveform — real AudioContext levels */}
           <div className={`aria-waveform ${ariaState==='speaking'||ariaState==='listening'?'active':ariaState==='thinking'?'thinking':''}`}>
-            {Array.from({length:18}).map((_,i)=>{
-              const isSpeaking = ariaState==='speaking';
-              const isListening = ariaState==='listening';
-              const isThinking = ariaState==='thinking';
-              const baseH = isSpeaking||isListening ? 4+Math.random()*18 : 3;
+            {waveLevels.map((h,i)=>{
+              const isL=ariaState==='listening', isT=ariaState==='thinking';
               return <div key={i} className="wave-bar" style={{
-                height: `${isSpeaking||isListening ? baseH : 3}px`,
-                background: isThinking?'#b090ff':isListening?'var(--urgent)':'var(--accent)',
-                animationDelay: isThinking?`${i*0.07}s`:'0s',
-                transition: isSpeaking ? `height ${0.08+Math.random()*0.06}s ease` : 'height 0.3s ease'
+                height:`${isT?3:isL?h:3}px`,
+                background:isT?'#b090ff':isL?'var(--urgent)':'var(--accent)',
+                animationDelay:isT?`${i*0.07}s`:'0s',
+                transition:isL?'height 0.04s ease':'height 0.25s ease'
               }}/>;
             })}
           </div>
@@ -1818,7 +1806,7 @@ function App() {
           <div className="talk-btn-wrap">
             <button className={`talk-btn ${isRecording?'recording':'idle'}`} onClick={toggleRecording}>
               <span className="talk-btn-icon">{isRecording?'⏹':'🎙'}</span>
-              {isRecording?'STOP RECORDING':'TAP TO TALK'}
+              {isRecording?'LISTENING — CLICK TO STOP':'TAP TO TALK'}
             </button>
           </div>
 
@@ -1835,9 +1823,9 @@ function App() {
           </div>
 
           {/* Captions */}
-          <div className="aria-captions" ref={captionsRef} dangerouslySetInnerHTML={{__html: String(ariaCaptions||"")}} />
+          <div className={`aria-captions${ariaState!=='idle'?' active':''}`} ref={captionsRef} dangerouslySetInnerHTML={{__html: String(ariaCaptions||"")}} />
         </div>
-        <div className="aria-chat">
+        <div className="aria-chat" ref={chatRef}>
           {ariaMessages.map((m,i)=>(
             <div key={i} className={`msg ${m.role}`}>
               <div className="msg-role">{m.role==='aria'?'ARIA':'You'}</div>
